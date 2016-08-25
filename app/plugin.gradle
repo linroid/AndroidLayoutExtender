@@ -1,0 +1,109 @@
+//import groovy.xml.XmlUtil
+//
+//apply plugin: AndroidXmlExtenderPlugin
+//
+//class AndroidXmlExtenderPlugin implements Plugin<Project> {
+//
+//    @Override
+//    void apply(Project project) {
+//        def List<File> xmlFiles = [new File('/Users/linroid/parent.xml'), new File('/Users/linroid/child.xml')]
+//        def List<Node> parents = new ArrayList<>();
+//        def List<Node> children = new ArrayList<>();
+//        xmlFiles.each { xml ->
+//            println("processing:" + xml.getAbsoluteFile())
+//            def root = new XmlParser().parse(xml)
+//            if (!"layout".equals(root.name())) {
+//                return
+//            }
+//            println("is layout file")
+//            if (root.children().size() == 1 && !"extends".equals(root.name())) {
+//                println "is parent"
+//                parents.add root;
+//                tree("", root)
+//            } else {
+//                root.children().each { Node node ->
+//                    if ("extends".equals(node.name())) {
+//                        println "is child, parent:" + node.attribute("layout")
+//                        children.add(root)
+//                        return;
+//                    } else if ("section".equals(node.name())) {
+//                        println "section:" + node.attribute("name")
+//                    }
+//                }
+//            }
+//            children.each { Node child ->
+//                Bundle bundle = new Bundle(new File('/Users/linroid/parent.xml')) // todo
+//                child.children().each { Node node ->
+//                    if ("section".equals(node.name())) {
+//                        bundle.put((String) node.attribute("name"), node)
+//                    }
+//                }
+//                bundle.print(child)
+//            }
+//        }
+//
+//    }
+//
+//    void tree(String div, Node node) {
+//        println div + "{"
+//        if ("section".equals(node.name())) {
+//            println div + "section:" + node.attribute("name")
+//        } else {
+//            println div + node.name()
+//        }
+//        if (node.children().size() > 0) {
+//            node.children().each { Node child ->
+//                tree(div + " ", child)
+//            }
+//        }
+//        println div + "}"
+//    }
+//}
+//
+//class Bundle {
+//    Node root;
+//    Map<String, Node> sections = new HashMap<>();
+//
+//    Bundle(File parentFile) {
+//        root = new XmlParser().parse(parentFile);
+//        tree(root);
+//        println "=========== before ============"
+//        println "-parent"
+//        println XmlUtil.serialize(root);
+//    }
+//
+//    void tree(Node node) {
+//        if ("section".equals(node.name())) {
+//            sections.put((String) node.attribute("name"), node)
+//        }
+//        if (node.children().size() > 0) {
+//            node.children().each { Node child ->
+//                tree(child)
+//            }
+//        }
+//    }
+//
+//    public void put(String name, Node section) {
+//        Node exists = sections.get(name);
+//        if (exists != null) {
+////            exists.replaceNode(new MergeNode(exists.parent(), section.children()));
+//            replaceNodeWithChildren(exists, section);
+//            sections.remove(name)
+//        }
+//    }
+//
+//    private static void replaceNodeWithChildren(Node source, Node target) {
+//        Node parent = source.parent();
+//        def index = parent.children().indexOf(source);
+//        parent.remove(source)
+//        parent.children().addAll(index, target.children())
+//    }
+//
+//    public void print() {
+//        sections.each { Map.Entry<String, Node> entry ->
+//            replaceNodeWithChildren(entry.value, entry.value)
+//        }
+//        // remove root <layout> tag
+//        println XmlUtil.serialize(root.children().get(0))
+//    }
+//}

@@ -1,4 +1,4 @@
-package com.linroid.androidxmlextender;
+package com.linroid.androidlayoutextender;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

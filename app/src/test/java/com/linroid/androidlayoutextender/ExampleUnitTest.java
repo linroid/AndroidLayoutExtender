@@ -1,4 +1,4 @@
-package com.linroid.androidxmlextender;
+package com.linroid.androidlayoutextender;
 
 import org.junit.Test;
 

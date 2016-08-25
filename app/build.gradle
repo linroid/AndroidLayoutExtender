@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-xml-extender'
+apply plugin: 'android-layout-extender'
 apply from: 'plugin.gradle'
 android {
     compileSdkVersion 23

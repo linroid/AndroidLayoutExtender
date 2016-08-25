@@ -28,7 +28,7 @@ uploadArchives {
             // 如果没有私服的话，发布到本地也是ok的
             repository(url: 'file:///Users/linroid/.mavenLocal')
             pom.version = '1.0.0'
-            pom.artifactId = 'android-xml-extender'
+            pom.artifactId = 'android-layout-extender'
             pom.project {
                 licenses {
                     license {

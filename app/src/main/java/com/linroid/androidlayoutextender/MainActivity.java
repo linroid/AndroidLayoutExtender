@@ -1,4 +1,4 @@
-package com.linroid.androidxmlextender;
+package com.linroid.androidlayoutextender;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;

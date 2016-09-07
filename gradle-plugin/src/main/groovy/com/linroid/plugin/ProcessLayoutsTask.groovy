@@ -4,7 +4,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.xml.sax.SAXException
 
-import javax.xml.bind.JAXBException
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.xpath.XPathExpressionException
 
@@ -14,7 +13,7 @@ import javax.xml.xpath.XPathExpressionException
  */
 class ProcessLayoutsTask extends DefaultTask {
     def LayoutProcessor layoutProcessor;
-    def File xmlOutFolder;
+//    def File xmlOutFolder;
     def int minSdk;
 
     @TaskAction
@@ -26,7 +25,7 @@ class ProcessLayoutsTask extends DefaultTask {
     }
 
     void writeLayoutXmls() throws Exception {
-        layoutProcessor.generateLayoutFiles(xmlOutFolder);
+        layoutProcessor.generateLayoutFiles();
     }
 
 }

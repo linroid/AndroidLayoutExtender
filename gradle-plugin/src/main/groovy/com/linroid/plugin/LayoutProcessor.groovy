@@ -36,7 +36,7 @@ class LayoutProcessor {
             }
 
             LayoutResource resource = new LayoutResource()
-            resource.dir = file.parentFile
+            resource.dir = file.parentFile.parentFile;
             resource.file = file
             resource.layoutName = LayoutFileHelper.getLayoutName(file)
             resource.qualifier = LayoutFileHelper.getQualifierName(file)
@@ -154,7 +154,6 @@ class LayoutProcessor {
 
     def writeXmlFile(File xmlOutDir, String qualifier, String layoutName, Node node) {
         String filename = generateExportFileName(qualifier, layoutName) + ".xml";
-        Log.d("writing %s", filename);
         String xml = XmlUtil.serialize(node.children().get(0) as Node);
         fileWriter.writeToFile(new File(xmlOutDir, filename), xml);
     }
@@ -181,14 +180,14 @@ class LayoutProcessor {
         }
     }
 
-    def generateLayoutFiles(File dir) {
+    def generateLayoutFiles() {
         /** traverse from parent to child **/
         parentLayoutResources.each { parent ->
             LayoutBundle bundle = new LayoutBundle();
             bundle.layoutName = parent.layoutName;
             bundle.qualifier = parent.qualifier;
             bundle.rootResource = parent;
-            bundle.outputDir = dir;
+            bundle.outputDir = parent.dir;
             traverseGenerateBundle(parent, bundle, false);
         }
     }

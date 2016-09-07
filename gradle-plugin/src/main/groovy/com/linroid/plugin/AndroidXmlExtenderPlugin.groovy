@@ -118,14 +118,14 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
         final ApiVersion minSdkVersion = configuration.minSdkVersion;
         ProcessAndroidResources generateRTask = variantData.generateRClassTask;
         final String packageName = generateRTask.packageForR;
-        String fullName = configuration.fullName;
+//        String fullName = configuration.fullName;
         List<File> resourceFolders = Arrays.asList(variantData.mergeResourcesTask.outputDir);
 
         FileWriter fileWriter = new FileWriter();
         final LayoutProcessor processor = new LayoutProcessor(packageName, resourceFolders, isLibrary, fileWriter);
         final ProcessAndroidResources processResTask = generateRTask;
-        final File xmlOutDir = new File(project.buildDir.absolutePath + "/layout-extender-generated/" + configuration.dirName);
-        Log.d("xml output for %s is %s", variantData, xmlOutDir);
+//        final File xmlOutDir = new File(project.buildDir.absolutePath + "/layout-extender-generated/" + configuration.dirName);
+//        Log.d("xml output for %s is %s", variantData, xmlOutDir);
         String layoutTaskName = "generateExtenderLayouts" + StringUtils.capitalize(processResTask.name);
 
         project.tasks.create(layoutTaskName,
@@ -134,12 +134,12 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
                     @Override
                     void execute(final ProcessLayoutsTask task) {
                         task.layoutProcessor = processor;
-                        task.xmlOutFolder = xmlOutDir;
+//                        task.xmlOutFolder = xmlOutDir;
                         task.minSdk = minSdkVersion.apiLevel;
 
                         Log.d("TASK adding dependency on %s for %s", task, processResTask);
                         processResTask.dependsOn(task);
-                        processResTask.getInputs().dir(xmlOutDir);
+//                        processResTask.inputs.dir(xmlOutDir);
                         for (Object dep : processResTask.dependsOn) {
                             if (dep == task) {
                                 continue;
@@ -147,7 +147,7 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
                             Log.d("adding dependency on %s for %s", dep, task);
                             task.dependsOn(dep);
                         }
-                        processResTask.doLast(new Action<Task>() {
+                        processResTask.doFirst(new Action<Task>() {
                             @Override
                             void execute(Task unused) {
                                 Log.d("now, output generated layout xml file");

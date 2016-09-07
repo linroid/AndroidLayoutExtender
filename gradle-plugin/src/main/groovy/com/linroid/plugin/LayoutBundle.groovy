@@ -10,6 +10,7 @@ public class LayoutBundle {
     String qualifier;
     Map<String, Node> sections;
     LayoutResource rootResource;
+    File outputDir;
 
     @Override
     protected LayoutBundle clone() {
@@ -18,6 +19,7 @@ public class LayoutBundle {
         bundle.qualifier = qualifier;
         bundle.sections = sections;
         bundle.rootResource = rootResource;
+        bundle.outputDir = outputDir;
         return bundle;
     }
 }

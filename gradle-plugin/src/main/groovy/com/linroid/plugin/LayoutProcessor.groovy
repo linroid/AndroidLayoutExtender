@@ -13,11 +13,13 @@ class LayoutProcessor {
     private Map<String, Map<String, LayoutResource>> mapper;
     private List<LayoutResource> allLayoutResources;
     private List<LayoutResource> parentLayoutResources;
+    private FileWriter fileWriter;
 
-    LayoutProcessor(String packageName, List<File> resources, boolean isLibrary) {
+    LayoutProcessor(String packageName, List<File> resources, boolean isLibrary, FileWriter fileWriter) {
         this.resources = resources
         this.packageName = packageName
         this.isLibrary = isLibrary
+        this.fileWriter = fileWriter;
     }
 
     def processResources() {
@@ -79,15 +81,6 @@ class LayoutProcessor {
                     parent.children.add(resource);
                 }
             }
-        }
-
-        /** traverse from parent to child **/
-        parentLayoutResources.each { parent ->
-            LayoutBundle bundle = new LayoutBundle();
-            bundle.layoutName = parent.layoutName;
-            bundle.qualifier = parent.qualifier;
-            bundle.rootResource = parent;
-            traverseGenerateBundle(parent, bundle, false);
         }
     }
 
@@ -154,8 +147,20 @@ class LayoutProcessor {
                 replaceNodeWithChildren(entity.value, entity.value);
             }
         }
-        println bundle.qualifier + "/" + bundle.layoutName + " >>>>";
-        println XmlUtil.serialize(node.children().get(0) as Node)
+//        println bundle.qualifier + "/" + bundle.layoutName + " >>>>";
+//        println XmlUtil.serialize(node.children().get(0) as Node)
+        writeXmlFile(bundle.outputDir, bundle.qualifier, bundle.layoutName, node);
+    }
+
+    def writeXmlFile(File xmlOutDir, String qualifier, String layoutName, Node node) {
+        String filename = generateExportFileName(qualifier, layoutName) + ".xml";
+        Log.d("writing %s", filename);
+        String xml = XmlUtil.serialize(node.children().get(0) as Node);
+        fileWriter.writeToFile(new File(xmlOutDir, filename), xml);
+    }
+
+    static def String generateExportFileName(String qualifier, String layoutName) {
+        return qualifier + File.separator + layoutName;
     }
 
     def Map<String, Node> parseSections(Node node) {
@@ -176,52 +181,52 @@ class LayoutProcessor {
         }
     }
 
-    def writeLayoutInfoFiles(File dir) {
-        mapper.each { entity ->
-            String layout = entity.value;
-            Map<String, LayoutResource> layoutMapper = entity.value;
-            layoutMapper.each { qualifierMapper ->
-                String qualifier = qualifierMapper.value;
-                LayoutResource resource = qualifierMapper.value;
-//                Node node = traverseNode(resource, null);
-            }
+    def generateLayoutFiles(File dir) {
+        /** traverse from parent to child **/
+        parentLayoutResources.each { parent ->
+            LayoutBundle bundle = new LayoutBundle();
+            bundle.layoutName = parent.layoutName;
+            bundle.qualifier = parent.qualifier;
+            bundle.rootResource = parent;
+            bundle.outputDir = dir;
+            traverseGenerateBundle(parent, bundle, false);
         }
     }
 
-    def Node traverseNode(LayoutResource layoutResource, Map<String, Node> sections) {
-        /** parent */
-        if (layoutResource.parentLayoutName == null) {
-            Node node = layoutResource.rootNode.clone() as Node;
-            Map<String, Node> nodeSections = parseSections(node);
-            sections.each { entity ->
-                replaceNodeWithChildren(nodeSections[entity.key], entity.value);
-            }
-            return node;
-        }
-        /** child */
-        Map<String, LayoutResource> parentMapper = mapper[layoutResource.parentLayoutName];
-        LayoutResource parent;
-        if (parentMapper.containsKey(layoutResource.qualifier)) {
-            parent = parentMapper[layoutResource.qualifier];
-        } else if (parentMapper.size() == 1) {
-            parent = parentMapper.entrySet().getAt(0).value;
-        }
-        if (parent == null) {
-            throw new IllegalStateException("null parent!")
-        }
-
-        if (sections == null) {
-            sections = new HashMap<>();
-            sections.putAll(layoutResource.sections);
-        } else {
-            layoutResource.sections.each { entity ->
-                if (!sections.containsKey(entity.key)) {
-                    sections[entity.key] = entity.value;
-                }
-            }
-        }
-        return traverseNode(parent, sections);
-    }
+//    def Node traverseNode(LayoutResource layoutResource, Map<String, Node> sections) {
+//        /** parent */
+//        if (layoutResource.parentLayoutName == null) {
+//            Node node = layoutResource.rootNode.clone() as Node;
+//            Map<String, Node> nodeSections = parseSections(node);
+//            sections.each { entity ->
+//                replaceNodeWithChildren(nodeSections[entity.key], entity.value);
+//            }
+//            return node;
+//        }
+//        /** child */
+//        Map<String, LayoutResource> parentMapper = mapper[layoutResource.parentLayoutName];
+//        LayoutResource parent;
+//        if (parentMapper.containsKey(layoutResource.qualifier)) {
+//            parent = parentMapper[layoutResource.qualifier];
+//        } else if (parentMapper.size() == 1) {
+//            parent = parentMapper.entrySet().getAt(0).value;
+//        }
+//        if (parent == null) {
+//            throw new IllegalStateException("null parent!")
+//        }
+//
+//        if (sections == null) {
+//            sections = new HashMap<>();
+//            sections.putAll(layoutResource.sections);
+//        } else {
+//            layoutResource.sections.each { entity ->
+//                if (!sections.containsKey(entity.key)) {
+//                    sections[entity.key] = entity.value;
+//                }
+//            }
+//        }
+//        return traverseNode(parent, sections);
+//    }
 
     private static void replaceNodeWithChildren(Node source, Node target) {
         Node parent = source.parent();

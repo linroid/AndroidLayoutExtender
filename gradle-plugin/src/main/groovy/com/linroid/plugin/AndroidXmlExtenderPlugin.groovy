@@ -23,7 +23,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 
-import javax.xml.bind.JAXBException
 import java.lang.reflect.Field
 
 /**
@@ -31,6 +30,7 @@ import java.lang.reflect.Field
  * @since 2016/08/24
  */
 class AndroidXmlExtenderPlugin implements Plugin<Project> {
+
     @Override
     void apply(Project project) {
         Log.setupLogger(project.logger);
@@ -121,11 +121,10 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
         String fullName = configuration.fullName;
         List<File> resourceFolders = Arrays.asList(variantData.mergeResourcesTask.outputDir);
 
-        final File codeGenTargetFolder = new File(project.buildDir.absolutePath + "/xml-extender-generated/" + configuration.dirName);
-        String writerOutBase = codeGenTargetFolder.absolutePath;
-        final LayoutProcessor processor = new LayoutProcessor(packageName, resourceFolders, isLibrary);
+        FileWriter fileWriter = new FileWriter();
+        final LayoutProcessor processor = new LayoutProcessor(packageName, resourceFolders, isLibrary, fileWriter);
         final ProcessAndroidResources processResTask = generateRTask;
-        final File xmlOutDir = new File(project.buildDir.absolutePath + "/layout-info/" + configuration.dirName);
+        final File xmlOutDir = new File(project.buildDir.absolutePath + "/layout-extender-generated/" + configuration.dirName);
         Log.d("xml output for %s is %s", variantData, xmlOutDir);
         String layoutTaskName = "generateExtenderLayouts" + StringUtils.capitalize(processResTask.name);
 
@@ -140,7 +139,7 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
 
                         Log.d("TASK adding dependency on %s for %s", task, processResTask);
                         processResTask.dependsOn(task);
-                        processResTask.inputs.dir(xmlOutDir);
+                        processResTask.getInputs().dir(xmlOutDir);
                         for (Object dep : processResTask.dependsOn) {
                             if (dep == task) {
                                 continue;
@@ -151,9 +150,10 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
                         processResTask.doLast(new Action<Task>() {
                             @Override
                             void execute(Task unused) {
+                                Log.d("now, output generated layout xml file");
                                 try {
                                     task.writeLayoutXmls();
-                                } catch (JAXBException e) {
+                                } catch (Exception e) {
                                     // gradle sometimes fails to resolve JAXBException.
                                     // We get stack trace manually to ensure we have the log
                                     Log.e(e, "cannot write layout xmls %s", ExceptionUtils.getStackTrace(e));

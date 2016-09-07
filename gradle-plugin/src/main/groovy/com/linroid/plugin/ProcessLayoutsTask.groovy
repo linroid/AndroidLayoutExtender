@@ -14,7 +14,6 @@ import javax.xml.xpath.XPathExpressionException
  */
 class ProcessLayoutsTask extends DefaultTask {
     def LayoutProcessor layoutProcessor;
-    def File sdkDir;
     def File xmlOutFolder;
     def int minSdk;
 
@@ -26,8 +25,8 @@ class ProcessLayoutsTask extends DefaultTask {
         layoutProcessor.processResources();
     }
 
-    void writeLayoutXmls() throws JAXBException {
-        layoutProcessor.writeLayoutInfoFiles(xmlOutFolder);
+    void writeLayoutXmls() throws Exception {
+        layoutProcessor.generateLayoutFiles(xmlOutFolder);
     }
 
 }

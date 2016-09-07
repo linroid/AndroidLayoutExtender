@@ -1,1 +1,2 @@
-include ':gradle-plugin', ':app'
+include ':app'
+//include ':gradle-plugin'

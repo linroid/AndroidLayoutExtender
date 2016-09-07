@@ -15,7 +15,8 @@ class Log {
 
     static void d(String message, Object... args) {
         String log = formatMessage(message, args);
-        sLogger.debug(log)
+//        sLogger.debug(log)
+        println log;
     }
 
     static void i(String message, Object... args) {

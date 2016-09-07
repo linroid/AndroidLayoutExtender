@@ -5,8 +5,19 @@ package com.linroid.plugin;
  * @since 8/25/16
  */
 public class LayoutBundle {
-    LayoutResource resource;
-    LayoutBundle parent;
+//    LayoutBundle child;
     String layoutName;
     String qualifier;
+    Map<String, Node> sections;
+    LayoutResource rootResource;
+
+    @Override
+    protected LayoutBundle clone() {
+        LayoutBundle bundle = new LayoutBundle();
+        bundle.layoutName = layoutName;
+        bundle.qualifier = qualifier;
+        bundle.sections = sections;
+        bundle.rootResource = rootResource;
+        return bundle;
+    }
 }

@@ -1,5 +1,7 @@
 package com.linroid.plugin
 
+import groovy.xml.XmlUtil
+
 /**
  * @author linroid <linroid@gmail.com>
  * @since 8/24/16
@@ -7,9 +9,10 @@ package com.linroid.plugin
 class LayoutProcessor {
     private List<File> resources;
     private String packageName;
-    private boolean isLibrary
-    private Map<String, Map<String, LayoutResource>> mapper
-    private List<LayoutResource> layoutResources
+    private boolean isLibrary;
+    private Map<String, Map<String, LayoutResource>> mapper;
+    private List<LayoutResource> allLayoutResources;
+    private List<LayoutResource> parentLayoutResources;
 
     LayoutProcessor(String packageName, List<File> resources, boolean isLibrary) {
         this.resources = resources
@@ -17,19 +20,18 @@ class LayoutProcessor {
         this.isLibrary = isLibrary
     }
 
-
     def processResources() {
         List<File> resourceFiles = getLayoutFiles(resources)
-        layoutResources = new ArrayList<>()
+        allLayoutResources = new ArrayList<>()
+        parentLayoutResources = new ArrayList<>()
         resourceFiles.each { File file ->
             Node node = new XmlParser().parse(file);
 
-            Log.d("processing %s", file.absolutePath)
+//            Log.d("processing %s", file.absolutePath)
 
             if (!"layout".equals(node.name())) {
                 return false;
             }
-            Log.d("%s is an AndroidLayoutExtender layout file", file.absolutePath);
 
             LayoutResource resource = new LayoutResource()
             resource.dir = file.parentFile
@@ -37,21 +39,24 @@ class LayoutProcessor {
             resource.layoutName = LayoutFileHelper.getLayoutName(file)
             resource.qualifier = LayoutFileHelper.getQualifierName(file)
             if (node.children().size() == 1 && node.attribute("extends") == null) {
-                println "is parent"
+                Log.d("(PARENT)\t\t%s/%s.xml", resource.qualifier, resource.layoutName);
+                parentLayoutResources.add(resource);
             } else {
                 String parent = node.attribute("extends");
                 if (parent != null) {
-                    resource.parentLayout = LayoutFileHelper.getLayoutName(parent);
+                    resource.parentLayoutName = LayoutFileHelper.getLayoutName(parent);
                 }
+                Log.d("(CHILD:%s)\t%s/%s.xml", resource.parentLayoutName, resource.qualifier, resource.layoutName);
             }
             resource.rootNode = node;
             resource.sections = parseSections(node);
-            this.layoutResources.add(resource);
+            this.allLayoutResources.add(resource);
         }
 
         /** mapper[layout][qualifier] */
+        /** Map<String, Map<String, LayoutResource>>  **/
         mapper = new HashMap<>()
-        this.layoutResources.each { resource ->
+        allLayoutResources.each { resource ->
 //            println resource
             Map<String, LayoutResource> layoutMapper = this.mapper[resource.layoutName];
             if (layoutMapper == null) {
@@ -60,26 +65,97 @@ class LayoutProcessor {
             }
             layoutMapper[resource.qualifier] = resource;
         }
-//        List<LayoutBundle> layoutBundles = new ArrayList<>();
-//        mapper.each { entity ->
-//            Map<String, LayoutResource> layoutMapper = entity.value;
-//        }
+        allLayoutResources.each { resource ->
+            if (resource.parentLayoutName != null) {
+                if (!mapper.containsKey(resource.parentLayoutName)) {
+                    throw new IllegalStateException("parent not exists: " + resource.parentLayoutName);
+                }
+                def parentLayouts = mapper.get(resource.parentLayoutName);
+                parentLayouts.each { parentEntry ->
+                    def parent = parentEntry.value;
+                    if (parent.children == null) {
+                        parent.children = new ArrayList<>();
+                    }
+                    parent.children.add(resource);
+                }
+            }
+        }
 
+        /** traverse from parent to child **/
+        parentLayoutResources.each { parent ->
+            LayoutBundle bundle = new LayoutBundle();
+            bundle.layoutName = parent.layoutName;
+            bundle.qualifier = parent.qualifier;
+            bundle.rootResource = parent;
+            traverseGenerateBundle(parent, bundle, false);
+        }
+    }
 
+    /**
+     *
+     * @param resource
+     * @param bundle
+     * @param hasFission parent has fission?
+     * @return
+     */
+    def traverseGenerateBundle(LayoutResource resource, LayoutBundle bundle, boolean hasFission) {
+        if (bundle.sections == null) {
+            bundle.sections = new HashMap<>();
+        }
+        bundle.sections.putAll(resource.sections);
+        outputBundle(bundle);
+        // leaf node
+        if (resource.children == null || resource.children.size() == 0) {
+            return;
+        }
+        List<LayoutResource> children = resource.children;
+        boolean needFission = false;
+        if (mapper.get(resource.layoutName).size() == 1 && children.size() > 1 && !hasFission) {
+            needFission = true;
+        }
 
+        if (needFission) {
+            bundle.layoutName = children.get(0).layoutName;
+            children.each { child ->
+                def childBundle = bundle.clone();
+                childBundle.qualifier = child.qualifier;
+                traverseGenerateBundle(child, childBundle, true);
+            }
+        } else {
+            boolean hasChild = false;
+            if (children.size() == 1) {
+                LayoutResource child = children.get(0);
+                bundle.layoutName = child.layoutName;
+                traverseGenerateBundle(child, bundle, hasFission);
+                hasChild = true;
+            } else {
+                resource.children.each { child ->
+                    if (child.qualifier.equals(bundle.qualifier)) {
+                        bundle.layoutName = child.layoutName;
+                        traverseGenerateBundle(child, bundle, hasFission);
+                        hasChild = true;
+                        return true;
+                    }
+                }
+            }
+            if (!hasChild) {
+                throw new IllegalStateException("not support");
+            }
+        }
+    }
 
-//        mapper.each { entry ->
-//            def list = entry.value;
-//            list.each { resource ->
-//                if (!mapper.containsKey(resource.parentLayout)) {
-//                    throw new IllegalStateException(resource.parentLayout + "not exists! File:" + resource.f.absolutePath);
-//                }
-//                List<LayoutResource> parents = mapper.get(resource.parentLayout);
-//            }
-//        }
-//        layoutResources.each { resource ->
-//            Map<String, LayoutResource> layoutMapper = mapper[resource.layoutName];
-//        }
+    def outputBundle(LayoutBundle bundle) {
+        Node node = new XmlParser().parse(bundle.rootResource.file);
+        def sections = parseSections(node);
+        sections.each { entity ->
+            if (bundle.sections.containsKey(entity.key)) {
+                replaceNodeWithChildren(entity.value, bundle.sections[entity.key]);
+            } else {
+                replaceNodeWithChildren(entity.value, entity.value);
+            }
+        }
+        println bundle.qualifier + "/" + bundle.layoutName + " >>>>";
+        println XmlUtil.serialize(node.children().get(0) as Node)
     }
 
     def Map<String, Node> parseSections(Node node) {
@@ -107,15 +183,15 @@ class LayoutProcessor {
             layoutMapper.each { qualifierMapper ->
                 String qualifier = qualifierMapper.value;
                 LayoutResource resource = qualifierMapper.value;
-                Node node = traverseNode(resource, null);
+//                Node node = traverseNode(resource, null);
             }
         }
     }
 
     def Node traverseNode(LayoutResource layoutResource, Map<String, Node> sections) {
         /** parent */
-        if (layoutResources.parentLayout == null) {
-            Node node = layoutResources.rootNode.clone() as Node;
+        if (layoutResource.parentLayoutName == null) {
+            Node node = layoutResource.rootNode.clone() as Node;
             Map<String, Node> nodeSections = parseSections(node);
             sections.each { entity ->
                 replaceNodeWithChildren(nodeSections[entity.key], entity.value);
@@ -123,7 +199,7 @@ class LayoutProcessor {
             return node;
         }
         /** child */
-        Map<String, LayoutResource> parentMapper = mapper[layoutResource.parentLayout];
+        Map<String, LayoutResource> parentMapper = mapper[layoutResource.parentLayoutName];
         LayoutResource parent;
         if (parentMapper.containsKey(layoutResource.qualifier)) {
             parent = parentMapper[layoutResource.qualifier];
@@ -138,7 +214,7 @@ class LayoutProcessor {
             sections = new HashMap<>();
             sections.putAll(layoutResource.sections);
         } else {
-            layoutResource.sctions.each { entity ->
+            layoutResource.sections.each { entity ->
                 if (!sections.containsKey(entity.key)) {
                     sections[entity.key] = entity.value;
                 }
@@ -153,6 +229,7 @@ class LayoutProcessor {
         parent.remove(source)
         parent.children().addAll(index, target.children())
     }
+
     static List<File> getLayoutFiles(List<File> resources) {
         List<File> result = new ArrayList<>();
         resources.each { File resource ->

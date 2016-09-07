@@ -9,11 +9,11 @@ class LayoutResource {
     File file;
     /** layout name **/
     String layoutName;
-    String parentLayout;
+    String parentLayoutName;
     String qualifier;
     Node rootNode;
     Map<String, Node> sections
-    LayoutBundle bundle;
+    List<LayoutResource> children;
 
     LayoutResource() {
     }
@@ -24,7 +24,7 @@ class LayoutResource {
                 "dir=" + dir +
                 ", file=" + file +
                 ", layoutName='" + layoutName + '\'' +
-                ", parentLayout='" + parentLayout + '\'' +
+                ", parentLayoutName='" + parentLayoutName + '\'' +
                 ", qualifier='" + qualifier + '\'' +
                 ", rootNode=" + rootNode +
                 ", sections=" + sections +

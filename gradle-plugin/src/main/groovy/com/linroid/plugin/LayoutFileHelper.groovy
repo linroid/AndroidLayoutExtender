@@ -25,7 +25,7 @@ class LayoutFileHelper {
      */
     static String getLayoutName(String name) {
         final int dot = name.lastIndexOf('/');
-        return dot < 0 ? name : name.substring(dot, name.length());
+        return dot < 0 ? name : name.substring(dot+1, name.length());
     }
 
     /**

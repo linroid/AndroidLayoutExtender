@@ -7,23 +7,27 @@ package com.linroid.plugin;
 class LayoutResource {
     File dir;
     File file;
-    String layout;
+    /** layout name **/
+    String layoutName;
     String parentLayout;
     String qualifier;
-    Node node;
+    Node rootNode;
+    Map<String, Node> sections
+    LayoutBundle bundle;
 
     LayoutResource() {
     }
 
     @Override
-    String toString() {
+    public String toString() {
         return "LayoutResource{" +
                 "dir=" + dir +
                 ", file=" + file +
-                ", layout='" + layout + '\'' +
+                ", layoutName='" + layoutName + '\'' +
                 ", parentLayout='" + parentLayout + '\'' +
                 ", qualifier='" + qualifier + '\'' +
-                ", node=" + node +
+                ", rootNode=" + rootNode +
+                ", sections=" + sections +
                 '}';
     }
 }

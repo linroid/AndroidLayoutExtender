@@ -2,14 +2,11 @@ package com.linroid.plugin;
 
 /**
  * @author linroid <linroid@gmail.com>
- * @since 8/24/16
+ * @since 8/25/16
  */
-class LayoutBundle {
-    Node rootNode;
-    Map<String, Node> sections;
+public class LayoutBundle {
+    LayoutResource resource;
     LayoutBundle parent;
-
-    File resDir;
-    LayoutBundle() {
-    }
+    String layoutName;
+    String qualifier;
 }

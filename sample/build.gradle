@@ -3,10 +3,7 @@
 buildscript {
     repositories {
         maven {
-            // 假如你有私服可以用的话，可以引用私服
-            // url 'http://10.XXX.XXX.XXX:8080/nexus/content/repositories/releases/'
-            // 没有的话，就本地引入，这里是给subProject设置，和上面类似
-            url '/Users/linroid/.mavenLocal'
+            url rootProject.rootDir.parent + "/repo"
         }
         jcenter()
     }
@@ -21,15 +18,8 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            // 假如你有私服可以用的话，可以引用私服
-            // url 'http://10.XXX.XXX.XXX:8080/nexus/content/repositories/releases/'
-            // 没有的话，就本地引入，这里是给subProject设置，和上面类似
-            url '/Users/linroid/.mavenLocal'
+            url rootProject.rootDir.parent + "/repo"
         }
         jcenter()
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }

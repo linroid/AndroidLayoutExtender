@@ -26,7 +26,7 @@ uploadArchives {
             //            authentication(userName: "admin", password: "admin")
             //        }
             // 如果没有私服的话，发布到本地也是ok的
-            repository(url: 'file:///Users/linroid/.mavenLocal')
+            repository(url: 'file://'+rootProject.rootDir.parent + "/repo")
             pom.version = '1.0.0'
             pom.artifactId = 'android-layout-extender'
             pom.project {

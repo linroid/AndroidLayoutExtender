@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        extends="@layout/banana_card">
+
+    <section
+        name="title">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ripe Banana"
+            android:textColor="#373737"
+            android:textSize="20sp"/>
+    </section>
+    <section name="extras" >
+        <ImageView
+            android:id="@+id/image"
+            android:layout_gravity="left"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </section>
+</layout>

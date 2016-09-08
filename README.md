@@ -32,3 +32,17 @@ Developing...
     </section>
 </layout>
 ```
+
+## generate...
+```xml
+<LinearLayout ...>
+    <LinearLayout>
+        <TextView .../>
+        <Button .../>
+    </LinearLayout>
+    <TextView .../>
+    <ReleativeLayout>
+        <ScrollView .../>
+    </ReleativeLayout>
+</LinearLayout>
+```

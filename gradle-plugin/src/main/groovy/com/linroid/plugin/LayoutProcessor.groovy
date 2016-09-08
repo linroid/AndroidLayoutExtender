@@ -7,7 +7,7 @@ import groovy.xml.XmlUtil
  * @since 8/24/16
  */
 class LayoutProcessor {
-    private List<File> resources;
+    private File resourcesFolder;
     private String packageName;
     private boolean isLibrary;
     private Map<String, Map<String, LayoutResource>> mapper;
@@ -15,15 +15,15 @@ class LayoutProcessor {
     private List<LayoutResource> parentLayoutResources;
     private FileWriter fileWriter;
 
-    LayoutProcessor(String packageName, List<File> resources, boolean isLibrary, FileWriter fileWriter) {
-        this.resources = resources
+    LayoutProcessor(String packageName, File resourcesFolder, boolean isLibrary, FileWriter fileWriter) {
+        this.resourcesFolder = resourcesFolder
         this.packageName = packageName
         this.isLibrary = isLibrary
         this.fileWriter = fileWriter;
     }
 
     def processResources() {
-        List<File> resourceFiles = getLayoutFiles(resources)
+        List<File> resourceFiles = getLayoutFiles(Arrays.asList(resourcesFolder))
         allLayoutResources = new ArrayList<>()
         parentLayoutResources = new ArrayList<>()
         resourceFiles.each { File file ->
@@ -102,16 +102,21 @@ class LayoutProcessor {
             return;
         }
         List<LayoutResource> children = resource.children;
+        Log.d("children:");
+        children.each { child ->
+            Log.d(child.layoutName);
+        };
         boolean needFission = false;
         if (mapper.get(resource.layoutName).size() == 1 && children.size() > 1 && !hasFission) {
             needFission = true;
         }
 
         if (needFission) {
-            bundle.layoutName = children.get(0).layoutName;
+//            bundle.layoutName = children.get(0).layoutName;
             children.each { child ->
                 def childBundle = bundle.clone();
                 childBundle.qualifier = child.qualifier;
+                childBundle.layoutName = child.layoutName;
                 traverseGenerateBundle(child, childBundle, true);
             }
         } else {
@@ -138,6 +143,7 @@ class LayoutProcessor {
     }
 
     def outputBundle(LayoutBundle bundle) {
+//        Node node = bundle.rootResource.rootNode.clone() as Node;
         Node node = new XmlParser().parse(bundle.rootResource.file);
         def sections = parseSections(node);
         sections.each { entity ->
@@ -180,14 +186,15 @@ class LayoutProcessor {
         }
     }
 
-    def generateLayoutFiles() {
+    def generateLayoutFiles(File outputDir) {
         /** traverse from parent to child **/
         parentLayoutResources.each { parent ->
             LayoutBundle bundle = new LayoutBundle();
             bundle.layoutName = parent.layoutName;
             bundle.qualifier = parent.qualifier;
             bundle.rootResource = parent;
-            bundle.outputDir = parent.dir;
+//            bundle.outputDir = parent.dir;
+            bundle.outputDir = outputDir;
             traverseGenerateBundle(parent, bundle, false);
         }
     }
@@ -228,7 +235,15 @@ class LayoutProcessor {
 //    }
 
     private static void replaceNodeWithChildren(Node source, Node target) {
+        if (source == null) {
+            return;
+        }
         Node parent = source.parent();
+        if (parent == null) {
+            Log.d("parent null")
+            Log.d(XmlUtil.serialize(source));
+            return;
+        }
         def index = parent.children().indexOf(source);
         parent.remove(source)
         parent.children().addAll(index, target.children())

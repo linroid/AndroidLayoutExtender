@@ -119,22 +119,25 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
         ProcessAndroidResources generateRTask = variantData.generateRClassTask;
         final String packageName = generateRTask.packageForR;
 //        String fullName = configuration.fullName;
-        List<File> resourceFolders = Arrays.asList(variantData.mergeResourcesTask.outputDir);
+        File resourceFolder = variantData.mergeResourcesTask.outputDir;
 
         FileWriter fileWriter = new FileWriter();
-        final LayoutProcessor processor = new LayoutProcessor(packageName, resourceFolders, isLibrary, fileWriter);
+        final LayoutProcessor processor = new LayoutProcessor(packageName, resourceFolder, isLibrary, fileWriter);
         final ProcessAndroidResources processResTask = generateRTask;
-//        final File xmlOutDir = new File(project.buildDir.absolutePath + "/layout-extender-generated/" + configuration.dirName);
+        final File xmlOutDir = new File(project.buildDir.absolutePath + "/intermediates/layout-extender-generated/" + configuration.dirName);
 //        Log.d("xml output for %s is %s", variantData, xmlOutDir);
         String layoutTaskName = "generateExtenderLayouts" + StringUtils.capitalize(processResTask.name);
 
+        final ProcessLayoutsTask[] processLayoutsTasks = new ProcessLayoutsTask[1];
         project.tasks.create(layoutTaskName,
                 ProcessLayoutsTask.class,
                 new Action<ProcessLayoutsTask>() {
                     @Override
                     void execute(final ProcessLayoutsTask task) {
+                        processLayoutsTasks[0] = task;
                         task.layoutProcessor = processor;
-//                        task.xmlOutFolder = xmlOutDir;
+                        task.generateDir = xmlOutDir;
+                        task.mergeDir = resourceFolder;
                         task.minSdk = minSdkVersion.apiLevel;
 
                         Log.d("TASK adding dependency on %s for %s", task, processResTask);
@@ -147,20 +150,41 @@ class AndroidXmlExtenderPlugin implements Plugin<Project> {
                             Log.d("adding dependency on %s for %s", dep, task);
                             task.dependsOn(dep);
                         }
-                        processResTask.doFirst(new Action<Task>() {
-                            @Override
-                            void execute(Task unused) {
-                                Log.d("now, output generated layout xml file");
-                                try {
-                                    task.writeLayoutXmls();
-                                } catch (Exception e) {
-                                    // gradle sometimes fails to resolve JAXBException.
-                                    // We get stack trace manually to ensure we have the log
-                                    Log.e(e, "cannot write layout xmls %s", ExceptionUtils.getStackTrace(e));
-                                }
-                            }
-                        });
+//                        processResTask.doLast(new Action<Task>() {
+//                            @Override
+//                            void execute(Task unused) {
+//                                Log.d("now, output generated layout xml file");
+//                                try {
+//                                    task.generateLayouts();
+//                                    task.mergeLayouts(resourceFolder);
+//                                } catch (Exception e) {
+//                                    // gradle sometimes fails to resolve JAXBException.
+//                                    // We get stack trace manually to ensure we have the log
+//                                    Log.e(e, "cannot write layout xmls %s", ExceptionUtils.getStackTrace(e));
+//                                }
+//                            }
+//                        });
                     }
                 });
+
+//        String fullName = configuration.getFullName();
+//        String packageJarTaskName = "package" + StringUtils.capitalize(fullName) + "Jar";
+//        final Task packageTask = project.getTasks().findByName(packageJarTaskName);
+//        if (packageTask instanceof Jar) {
+//
+//            final ProcessLayoutsTask processLayoutsTask = processLayoutsTasks[0];
+//            String mergeLayoutTaskName = "mergeExtenderLayouts" + StringUtils.capitalize(processResTask.name);
+//            project.tasks.create(mergeLayoutTaskName, MergeLayoutsTask.class, new Action<MergeLayoutsTask>() {
+//
+//                @Override
+//                void execute(final MergeLayoutsTask task) {
+//                    task.outputDir  = resourceFolder
+//                    task.inputDir   = xmlOutDir
+//                    processResTask.dependsOn(task);
+//                    task.dependsOn(processLayoutsTask);
+//                    task.mustRunAfter(processLayoutsTask)
+//                }
+//            });
+//        }
     }
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        extends="@layout/common_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    <section
+        name="title">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apple"
+            android:textColor="#373737"
+            android:textSize="20sp"/>
+    </section>
+
+    <section
+        name="subtitle">
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Apple Description"
+            android:textSize="16sp"/>
+    </section>
+</layout>

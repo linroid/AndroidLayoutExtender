@@ -1,6 +1,8 @@
 # AndroidLayoutExtender
 Developing...
 
+ > A gradle plugin to make Android layout xml extendable!
+
 ## root layout
 ```xml
 <?xml version="1.0" encoding="utf-8"?>

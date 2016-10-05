@@ -7,6 +7,10 @@ import groovy.xml.XmlUtil
  * @since 8/24/16
  */
 class LayoutProcessor {
+    public static final String LAYOUT_NODE_NAME = "support.layout";
+    public static final String SECTION_NODE_NAME = "support.section";
+    public static final String PARENT_ATTR_NAME = "parent";
+    public static final String NAME_ATTR_NAME = "name";
     private File resourcesFolder;
     private String packageName;
     private boolean isLibrary;
@@ -31,7 +35,7 @@ class LayoutProcessor {
 
 //            Log.d("processing %s", file.absolutePath)
 
-            if (!"layout".equals(node.name())) {
+            if (!LAYOUT_NODE_NAME.equals(node.name().toString().toLowerCase())) {
                 return false;
             }
 
@@ -40,11 +44,11 @@ class LayoutProcessor {
             resource.file = file
             resource.layoutName = LayoutFileHelper.getLayoutName(file)
             resource.qualifier = LayoutFileHelper.getQualifierName(file)
-            if (node.children().size() == 1 && node.attribute("extends") == null) {
+            if (node.children().size() == 1 && node.attribute(PARENT_ATTR_NAME) == null) {
                 Log.d("(PARENT)\t\t%s/%s.xml", resource.qualifier, resource.layoutName);
                 parentLayoutResources.add(resource);
             } else {
-                String parent = node.attribute("extends");
+                String parent = node.attribute(PARENT_ATTR_NAME);
                 if (parent != null) {
                     resource.parentLayoutName = LayoutFileHelper.getLayoutName(parent);
                 }
@@ -178,8 +182,8 @@ class LayoutProcessor {
         if (node == null) {
             return;
         }
-        if ('section'.equals(node.name())) {
-            sections.put(node.attribute('name') as String, node);
+        if (SECTION_NODE_NAME.equals(node.name().toString().toLowerCase())) {
+            sections.put(node.attribute(NAME_ATTR_NAME) as String, node);
         }
         node.children().each { Node child ->
             parseSections(child, sections);

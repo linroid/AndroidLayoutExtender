@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-
-    <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<support.layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    <android.support.design.widget.CoordinatorLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -24,9 +26,12 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <section name="content">
-            <include layout="@layout/activity_main"/>
-        </section>
+        <support.section app:name="content"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content">
+
+            <!--<include layout="@layout/activity_main"/>-->
+        </support.section>
 
         <!--<android.support.design.widget.FloatingActionButton-->
         <!--android:id="@+id/fab"-->
@@ -37,4 +42,4 @@
         <!--android:src="@android:drawable/ic_dialog_email"/>-->
 
     </android.support.design.widget.CoordinatorLayout>
-</layout>
+</support.layout>

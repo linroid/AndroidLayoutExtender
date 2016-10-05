@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<support.layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -17,7 +19,10 @@
             android:layout_margin="16dp"
             android:orientation="vertical">
 
-            <section name="title">
+            <support.section
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:name="title">
 
                 <TextView
                     android:id="@+id/title"
@@ -26,7 +31,7 @@
                     android:text="Title"
                     android:textColor="#373737"
                     android:textSize="20sp"/>
-            </section>
+            </support.section>
 
             <View
                 android:layout_width="match_parent"
@@ -34,7 +39,10 @@
                 android:layout_marginTop="4dp"
                 android:background="#c7c7c7"/>
 
-            <section name="subtitle">
+            <support.section
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:name="subtitle">
 
                 <TextView
                     android:id="@+id/subtitle"
@@ -43,8 +51,7 @@
                     android:layout_marginTop="16dp"
                     android:text="SubTitle"
                     android:textSize="16sp"/>
-            </section>
-            <section name="extras"></section>
+            </support.section>
         </LinearLayout>
     </android.support.v7.widget.CardView>
-</layout>
+</support.layout>

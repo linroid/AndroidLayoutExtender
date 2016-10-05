@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout extends="@layout/coordinator_layout">
+<support.layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:parent="@layout/coordinator_layout">
 
-    <section name="content">
+    <support.section
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:name="content">
 
         <ScrollView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?actionBarSize"
+            android:layout_marginTop="56dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             tools:context="com.linroid.androidlayoutextender.MainActivity"
@@ -25,9 +32,9 @@
 
                 <include layout="@layout/banana_card"/>
 
-                <include layout="@layout/ripe_banana_card"/>
+                <!--<include layout="@layout/ripe_banana_card"/>-->
 
             </LinearLayout>
         </ScrollView>
-    </section>
-</layout>
+    </support.section>
+</support.layout>

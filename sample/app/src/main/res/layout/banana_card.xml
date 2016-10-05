@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        extends="@layout/common_card"
+<support.layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:parent="@layout/common_card">
 
-    <section
-        name="title">
+    <support.section
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:name="title">
 
         <TextView
             android:id="@+id/title"
@@ -14,10 +17,12 @@
             android:text="Banana"
             android:textColor="#373737"
             android:textSize="20sp"/>
-    </section>
+    </support.section>
 
-    <section
-        name="subtitle">
+    <support.section
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:name="subtitle">
 
         <TextView
             android:id="@+id/subtitle"
@@ -26,5 +31,11 @@
             android:layout_marginTop="16dp"
             android:text="Banana Description"
             android:textSize="16sp"/>
-    </section>
-</layout>
+
+        <!--<support.section-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:name="extras">-->
+        <!--</support.section>-->
+    </support.section>
+</support.layout>

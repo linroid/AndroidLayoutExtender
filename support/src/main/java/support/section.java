@@ -1,7 +1,10 @@
 package support;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -9,7 +12,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.linroid.androidlayoutextender.R;
+
+import com.linroid.plugin.support.R;
 
 import java.util.List;
 import java.util.Map;
@@ -74,7 +78,6 @@ public class section extends FrameLayout {
 //                }
                 View view = shouldLoadChildren.get(i);
                 shouldLoad.removeView(view);
-                RelativeLayout.LayoutParams
 //                parent.addView(view, index + i);
                 AttributeLayoutParams layoutParams = (AttributeLayoutParams) view.getLayoutParams();
 //                    ViewGroup.LayoutParams params = parent.generateLayoutParams(layoutParams.getAttributeSet());
@@ -162,6 +165,8 @@ public class section extends FrameLayout {
             super(source);
         }
 
+        @TargetApi(Build.VERSION_CODES.KITKAT)
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public AttributeLayoutParams(LayoutParams source) {
             super(source);
         }

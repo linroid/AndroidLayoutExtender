@@ -1,14 +1,18 @@
 package support;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.linroid.androidlayoutextender.R;
+
+import com.linroid.plugin.support.R;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -217,6 +221,8 @@ public class layout extends FrameLayout {
             super(source);
         }
 
+        @TargetApi(Build.VERSION_CODES.KITKAT)
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public AttributeLayoutParams(LayoutParams source) {
             super(source);
         }

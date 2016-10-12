@@ -293,9 +293,9 @@ public class layout extends FrameLayout {
     }
 
     private void checkEditMode() {
-//        if (!isInEditMode()) {
-//            throw new IllegalAccessError("support.layout only works for support Android Studio preview");
-//        }
+        if (!isInEditMode()) {
+            throw new IllegalAccessError("support.layout only works for support Android Studio preview");
+        }
     }
 
     private section findSectionByName(String name) {

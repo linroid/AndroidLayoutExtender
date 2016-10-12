@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'android-layout-extender'
+apply plugin: 'android-layout-extender'
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"

@@ -44,11 +44,11 @@ class LayoutProcessor {
             resource.file = file
             resource.layoutName = LayoutFileHelper.getLayoutName(file)
             resource.qualifier = LayoutFileHelper.getQualifierName(file)
-            if (node.children().size() == 1 && node.attribute(PARENT_ATTR_NAME) == null) {
+            String parent = findNodeAttribute(node, PARENT_ATTR_NAME)
+            if (node.children().size() == 1 && parent == null) {
                 Log.d("(PARENT)\t\t%s/%s.xml", resource.qualifier, resource.layoutName);
                 parentLayoutResources.add(resource);
             } else {
-                String parent = node.attribute(PARENT_ATTR_NAME);
                 if (parent != null) {
                     resource.parentLayoutName = LayoutFileHelper.getLayoutName(parent);
                 }
@@ -183,11 +183,25 @@ class LayoutProcessor {
             return;
         }
         if (SECTION_NODE_NAME.equals(node.name().toString().toLowerCase())) {
-            sections.put(node.attribute(NAME_ATTR_NAME) as String, node);
+            sections.put(findNodeAttribute(node, NAME_ATTR_NAME), node);
         }
         node.children().each { Node child ->
             parseSections(child, sections);
         }
+    }
+
+    private static String findNodeAttribute(Node node, String searchKey) {
+        Map<String, String> attributes = node.attributes();
+        for (String key : attributes) {
+            if (key.equals(searchKey)) {
+                return attributes.get(key);
+            }
+            if (key.contains("}" + searchKey + "=")) {
+                String[] parts = key.split("=");
+                return parts[parts.length - 1];
+            }
+        }
+        return null;
     }
 
     def generateLayoutFiles(File outputDir) {
